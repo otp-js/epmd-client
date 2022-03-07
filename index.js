@@ -172,20 +172,22 @@ exports.Client = Client;
  * @param {String} name - Target node name
  * @param {Function} cb
  */
-exports.getNode = function getNode(host, epmdPort, name, cb) {
-    let c = new Client(host, epmdPort);
-    c.on('connect', function () {
-        c.getNode(name);
+exports.getNode = async function getNode(host, epmdPort, name, cb) {
+    return new Promise((resolve, reject) => {
+        let c = new Client(host, epmdPort);
+        c.on('connect', function () {
+            c.getNode(name);
+        });
+        c.on('node', function (node) {
+            c.end();
+            resolve(node);
+        });
+        c.on('error', function (err) {
+            c.end();
+            reject(err);
+        });
+        c.connect();
     });
-    c.on('node', function (node) {
-        c.end();
-        cb(null, node);
-    });
-    c.on('error', function (err) {
-        c.end();
-        cb(err);
-    });
-    c.connect();
 };
 
 /**
@@ -201,20 +203,22 @@ exports.getNode = function getNode(host, epmdPort, name, cb) {
  * @param {number} epmdPort - EPMD Port
  * @param {Function} cb
  */
-exports.getAllNodes = function getAllNodes(host, epmdPort, cb) {
-    let c = new Client(host, epmdPort);
-    c.on('connect', function () {
-        c.getAllNodes();
+exports.getAllNodes = async function getAllNodes(host, epmdPort, cb) {
+    return new Promise((resolve, reject) => {
+        let c = new Client(host, epmdPort);
+        c.on('connect', function () {
+            c.getAllNodes();
+        });
+        c.on('nodeinfo', function (nodes) {
+            c.end();
+            resolve(nodes);
+        });
+        c.on('error', function (err) {
+            c.end();
+            reject(err);
+        });
+        c.connect();
     });
-    c.on('nodeinfo', function (nodes) {
-        c.end();
-        cb(null, nodes);
-    });
-    c.on('error', function (err) {
-        c.end();
-        cb(err);
-    });
-    c.connect();
 };
 
 /**
@@ -230,18 +234,20 @@ exports.getAllNodes = function getAllNodes(host, epmdPort, cb) {
  * @param {number} epmdPort - EPMD Port
  * @param {Function} cb
  */
-exports.dumpEpmd = function dumpEpmd(host, epmdPort, cb) {
-    let c = new Client(host, epmdPort);
-    c.on('connect', function () {
-        c.dumpEpmd();
+exports.dumpEpmd = async function dumpEpmd(host, epmdPort, cb) {
+    return new Promise((resolve, reject) => {
+        let c = new Client(host, epmdPort);
+        c.on('connect', function () {
+            c.dumpEpmd();
+        });
+        c.on('nodeinfo', function (nodes) {
+            c.end();
+            resolve(nodes);
+        });
+        c.on('error', function (err) {
+            c.end();
+            reject(err);
+        });
+        c.connect();
     });
-    c.on('nodeinfo', function (nodes) {
-        c.end();
-        cb(null, nodes);
-    });
-    c.on('error', function (err) {
-        c.end();
-        cb(err);
-    });
-    c.connect();
 };

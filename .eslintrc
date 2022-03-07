@@ -1,1 +1,1 @@
-{ "extends": ["eslint:recommended"] }
+{ "extends": ["eslint:recommended"], "indent": ["error", 4] }

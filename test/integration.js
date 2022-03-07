@@ -45,20 +45,12 @@ describe('integration', function () {
                 c.register(TEST_PORT, TEST_NAME);
             });
             c.on('alive', function () {
-                client.getNode(
-                    HOST,
-                    EPMD_PORT,
-                    TEST_NAME,
-                    function (err, node) {
-                        if (err) {
-                            throw err;
-                        }
-                        node.data.name.should.equal(TEST_NAME);
-                        node.data.port.should.equal(TEST_PORT);
-                        c.end();
-                        done();
-                    }
-                );
+                client.getNode(HOST, EPMD_PORT, TEST_NAME).then((node) => {
+                    node.data.name.should.equal(TEST_NAME);
+                    node.data.port.should.equal(TEST_PORT);
+                    c.end();
+                    done();
+                });
             });
             c.on('error', function (err) {
                 throw err;
@@ -78,10 +70,7 @@ describe('integration', function () {
                 c.register(TEST_PORT, TEST_NAME);
             });
             c.on('alive', function () {
-                client.getAllNodes(HOST, EPMD_PORT, function (err, nodes) {
-                    if (err) {
-                        throw err;
-                    }
+                client.getAllNodes(HOST, EPMD_PORT).then((nodes) => {
                     nodes.length.should.equal(1);
                     let node = nodes[0];
                     node.name.should.equal(TEST_NAME);
@@ -110,7 +99,7 @@ describe('integration', function () {
                 c.register(TEST_PORT, TEST_NAME);
             });
             c.on('alive', function () {
-                client.dumpEpmd(HOST, EPMD_PORT, function (err, nodes) {
+                client.dumpEpmd(HOST, EPMD_PORT).then((nodes) => {
                     if (err) {
                         throw err;
                     }

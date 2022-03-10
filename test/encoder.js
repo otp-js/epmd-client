@@ -24,15 +24,15 @@ describe('encoder', function () {
         });
     });
 
-    describe('#aliveRequest()', function () {
+    describe('#alive2Request()', function () {
         it('should create a valid ALIVE_REQ', function () {
             let port = 1;
             let nodeName = 'testing';
             let nodeLength = Buffer.byteLength(nodeName);
-            let req = encoder.aliveRequest(port, nodeName);
+            let req = encoder.alive2Request(port, nodeName);
 
             req.length.should.equal(13 + nodeLength);
-            req.readUInt8(0).should.equal(constants.ALIVE_REQ);
+            req.readUInt8(0).should.equal(constants.ALIVE2_REQ);
             req.readUInt16BE(1).should.equal(port);
             req.readUInt8(3).should.equal(constants.NODE_TYPE_NORMAL);
             req.readUInt8(4).should.equal(constants.PROTOCOL_IPV4);

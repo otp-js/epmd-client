@@ -1,1 +1,7 @@
-{ "extends": ["eslint:recommended"], "indent": ["error", 4] }
+{
+    "extends": ["eslint:recommended"],
+    "rules": {
+        "indent": ["error", 4]
+    },
+    "env": { "browser": true, "node": true, "es2022": true }
+}

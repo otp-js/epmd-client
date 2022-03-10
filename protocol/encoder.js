@@ -42,32 +42,24 @@ function requestWrapper(req) {
  * @param {string} nodeName
  * @returns {Buffer}
  */
-function aliveRequest(port, nodeName) {
+function alive2Request(port, nodeName) {
     const nodeLength = Buffer.byteLength(nodeName, 'utf8');
-    const baseLength = 13;
-    const req = Buffer.alloc(nodeLength + baseLength);
+    const extra = Buffer.alloc(0);
+    const length = 1 + 2 + 1 + 1 + 2 + 2 + 2 + nodeLength + 2 + extra.length;
+    const buff = Buffer.alloc(length);
 
-    let offset = 0;
-    req.writeUInt8(constants.ALIVE_REQ, offset);
-    offset = 1;
-    req.writeUInt16BE(port, offset);
-    offset = 3;
-    req.writeUInt8(constants.NODE_TYPE_NORMAL, offset);
-    offset = 4;
-    req.writeUInt8(constants.PROTOCOL_IPV4, offset);
-    offset = 5;
-    req.writeUInt16BE(constants.HIGHEST_VERSION, offset);
-    offset = 7;
-    req.writeUInt16BE(constants.LOWEST_VERSION, offset);
-    offset = 9;
-    req.writeUInt16BE(nodeLength, offset);
-    offset = 11;
-    req.write(nodeName, offset, nodeLength, 'utf8');
-    offset = offset + nodeLength;
-    // Elen
-    req.writeUInt16BE(0, offset);
+    buff.writeUInt8(constants.ALIVE2_REQ, 0);
+    buff.writeUInt16BE(port, 1);
+    buff.writeUInt8(constants.NODE_TYPE_NORMAL, 3);
+    buff.writeUInt8(constants.PROTOCOL_IPV4, 4);
+    buff.writeUInt16BE(6, 5);
+    buff.writeUInt16BE(5, 7);
+    buff.writeUInt16BE(nodeLength, 9);
+    buff.write(nodeName, 11, 'utf8');
+    buff.writeUInt16BE(extra.length, 11 + nodeLength);
+    buff.set(extra, 13 + nodeLength);
 
-    return req;
+    return buff;
 }
 
 /**
@@ -147,7 +139,7 @@ function killRequest() {
 
 module.exports = {
     requestWrapper: requestWrapper,
-    aliveRequest: aliveRequest,
+    alive2Request: alive2Request,
     portPleaseRequest: portPleaseRequest,
     namesRequest: namesRequest,
     dumpRequest: dumpRequest,

@@ -27,17 +27,19 @@ class DecoderError extends Error {
  * @throws DecoderError
  * @returns {{code: number, data: *} | []}
  */
-exports.decode = function decode (buf) {
-  let code = buf.readUInt8(0)
-  switch (code) {
+exports.decode = function decode(buf) {
+    let code = buf.readUInt8(0);
+    switch (code) {
     case constants.ALIVE_RESP:
-      return decodeAliveResponse(buf)
+        return decodeAliveResponse(buf);
+    case constants.ALIVE2_X_RESP:
+        return decodeAlive2XResponse(buf);
     case constants.PORT2_RESP:
-      return decodePortResponse(buf)
+        return decodePortResponse(buf);
     default:
-      return decodeNodeInfo(buf)
-  }
-}
+        return decodeNodeInfo(buf);
+    }
+};
 
 /**
  * Decodes ALIVE_RESP
@@ -61,8 +63,18 @@ function decodeAliveResponse (buf) {
     code: constants.ALIVE_RESP,
     data: {
       creation: buf.slice(2)
+function decodeAlive2XResponse(buf) {
+    let result = buf.readUInt8(1);
+    if (result > 0) {
+        throw new DecoderError(`EPMD returned an error. Result "${result}"`);
     }
-  }
+
+    return {
+        code: constants.ALIVE2_X_RESP,
+        data: {
+            creation: buf.slice(2),
+        },
+    };
 }
 
 /**
@@ -135,19 +147,19 @@ function decodePortResponse (buf) {
  * @throws DecoderError
  * @returns {[{portNo: number, nodeInfo: string, fd: number|null}]}
  */
-function decodeNodeInfo (buf) {
-  let lines = buf.toString('utf8', 0).split('\n')
-  let nodes = []
-  for (let i = 0, l = lines.length; i < l; i++) {
-    let nodeInfo = lines[i].match(constants.NODE_REGEXP)
-    if (nodeInfo === null) {
-      continue
+function decodeNodeInfo(buf) {
+    let lines = buf.toString('utf8', 0).split('\n');
+    let nodes = [];
+    for (let i = 0, l = lines.length; i < l; i++) {
+        let nodeInfo = lines[i].match(constants.NODE_REGEXP);
+        if (nodeInfo === null) {
+            continue;
+        }
+        nodes.push({
+            name: nodeInfo[1],
+            port: parseInt(nodeInfo[2], 10),
+            fd: nodeInfo[4] ? parseInt(nodeInfo[4], 10) : null,
+        });
     }
-    nodes.push({
-      name: nodeInfo[1],
-      port: parseInt(nodeInfo[2], 10),
-      fd: nodeInfo[4] ? parseInt(nodeInfo[4], 10) : null
-    })
-  }
-  return nodes
+    return nodes;
 }

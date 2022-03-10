@@ -14,6 +14,7 @@ const constants = require('./protocol/constants');
 
 const TYPE_EVENT_MAP = {};
 TYPE_EVENT_MAP[constants.ALIVE_RESP] = 'alive';
+TYPE_EVENT_MAP[constants.ALIVE2_X_RESP] = 'alive';
 TYPE_EVENT_MAP[constants.PORT2_RESP] = 'node';
 
 /**
@@ -55,7 +56,7 @@ class Client extends EventEmitter {
      */
     register(port, name) {
         debug('> ALIVE_REQ');
-        this._send(encoder.aliveRequest(port, name));
+        this._send(encoder.alive2Request(port, name));
     }
 
     /**
@@ -172,7 +173,7 @@ exports.Client = Client;
  * @param {String} name - Target node name
  * @param {Function} cb
  */
-exports.getNode = async function getNode(host, epmdPort, name, cb) {
+exports.getNode = async function getNode(host, epmdPort, name) {
     return new Promise((resolve, reject) => {
         let c = new Client(host, epmdPort);
         c.on('connect', function () {
@@ -203,7 +204,7 @@ exports.getNode = async function getNode(host, epmdPort, name, cb) {
  * @param {number} epmdPort - EPMD Port
  * @param {Function} cb
  */
-exports.getAllNodes = async function getAllNodes(host, epmdPort, cb) {
+exports.getAllNodes = async function getAllNodes(host, epmdPort) {
     return new Promise((resolve, reject) => {
         let c = new Client(host, epmdPort);
         c.on('connect', function () {
@@ -234,7 +235,7 @@ exports.getAllNodes = async function getAllNodes(host, epmdPort, cb) {
  * @param {number} epmdPort - EPMD Port
  * @param {Function} cb
  */
-exports.dumpEpmd = async function dumpEpmd(host, epmdPort, cb) {
+exports.dumpEpmd = async function dumpEpmd(host, epmdPort) {
     return new Promise((resolve, reject) => {
         let c = new Client(host, epmdPort);
         c.on('connect', function () {

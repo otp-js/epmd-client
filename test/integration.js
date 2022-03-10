@@ -100,9 +100,6 @@ describe('integration', function () {
             });
             c.on('alive', function () {
                 client.dumpEpmd(HOST, EPMD_PORT).then((nodes) => {
-                    if (err) {
-                        throw err;
-                    }
                     nodes.length.should.equal(1);
                     let node = nodes[0];
                     node.name.should.equal(TEST_NAME);
